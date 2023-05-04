@@ -41,13 +41,13 @@ public:
             e.push_back(t);
         }
         int sz = N;
-        int step = 1;
+        int step = 7;
         int a = 0;
         int b = step;
         for (int i = m; i > 0;) {
             b += step;
             if(b >= N){
-                a += step;
+                a += 3;
                 b -= N;
                 if(a > N) a-= N;
             }
@@ -55,7 +55,7 @@ public:
             if(a == b) continue; // не петля
             if (e2[a][b]) continue; // не кратное ребро
             if (s.get(a) != s.get(b) && sz == n) continue; // не уменьшат кол - во компонент так как уже минимум
-
+            //cout << i << " " << sz << endl;
             if (s.get(a) != s.get(b)) sz--;
 
             int w = rand() % MAX_W + 1;
@@ -71,7 +71,7 @@ public:
 
 class heap{
 public:
-    pair <int, int> q[MAX_M];
+    pair <int, int> q[50000];
     int n = 0;
     bool empty(){
         return (n == 0);
@@ -139,7 +139,7 @@ public:
     };
     void djikstra_heap(brg &a){
         for(int i = 0; i < N; i++) {
-            heap q;э
+            heap q;
             vector <int> v(N, 0);
             vector <int> dist(N, N * MAX_W + 1);
             dist[i] = 0;

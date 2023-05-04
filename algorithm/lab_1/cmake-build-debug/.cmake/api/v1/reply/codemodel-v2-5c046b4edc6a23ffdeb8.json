@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "D:/algorithm/lab_1/cmake-build-debug",
-		"source" : "D:/algorithm/lab_1"
+		"build" : "D:/4-sem-programming/algorithm/lab_1/cmake-build-debug",
+		"source" : "D:/4-sem-programming/algorithm/lab_1"
 	},
 	"version" : 
 	{
