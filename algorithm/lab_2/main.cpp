@@ -2,10 +2,11 @@
 
 using namespace std;
 
-const int N = 600;
+const int N = 100;
 const int MAX_M = (N) * (N - 1) / 2;
 const int MAX_W = 5000;
-int d[N][N], d2[N][N];
+vector <vector <int>> d(N, vector <int>(N, N * MAX_W));
+vector <vector <int>> d2(N, vector <int>(N, N * MAX_W));
 
 class brg{ // build_random_graph
 public:
@@ -109,50 +110,19 @@ public:
 
 class solution{
 public:
-    void djikstra_queue(brg &a){ // O(nlogn)
+    template <typename T>
+    void djikstra(brg &a, T q, vector <vector <int>> &d){ // O(n^2logm)
         for(int i = 0; i < N; i++) {
-            priority_queue <pair <int, int>> q;
             vector <int> v(N, 0);
             vector <int> dist(N, N * MAX_W + 1);
             dist[i] = 0;
-            // cout << "new start node " << i << endl;
             q.push({0, i});
             while(!q.empty()){
 
                 int u = q.top().second;
-                // cout << u << endl;
                 q.pop();
                 if(v[u]) continue;
                 v[u] = 1;
-                //   cout << "find from " << u << endl;
-                for(auto [to, w] : a.e[u]){
-                    if(v[to]) continue;
-                    dist[to] = min(dist[to], dist[u] + w);
-                    q.push({-dist[to], to});
-                }
-            }
-            for(int k = 0; k < N; k++){
-                d[i][k] = dist[k];
-            }
-        }
-
-    };
-    void djikstra_heap(brg &a){
-        for(int i = 0; i < N; i++) {
-            heap q;
-            vector <int> v(N, 0);
-            vector <int> dist(N, N * MAX_W + 1);
-            dist[i] = 0;
-            // cout << "new start node " << i << endl;
-            q.push({0, i});
-            while(!q.empty()){
-
-                int u = q.top().second;
-                // cout << u << endl;
-                q.pop();
-                if(v[u]) continue;
-                v[u] = 1;
-                //   cout << "find from " << u << endl;
                 for(auto [to, w] : a.e[u]){
                     if(v[to]) continue;
                     dist[to] = min(dist[to], dist[u] + w);
@@ -160,9 +130,10 @@ public:
                 }
             }
             for(int k = 0; k < N; k++){
-                d2[i][k] = dist[k];
+                d[i][k] = dist[k];
             }
         }
+
     };
 };
 
@@ -186,9 +157,19 @@ int main() {
         int start =  clock();
         solution s;
         // выбрать через что считать деисктру
-        //s.djikstra_queue(a);
-        s.djikstra_heap(a);
+        priority_queue <pair <int, int>, vector<pair <int, int>>, greater<pair <int, int>> > q1;
+        heap q2;
+        s.djikstra(a, q1, d);
+        s.djikstra(a, q2, d2);
         int end = clock();
+        for(int j = 0; j < N; j++){
+            for(int j2 = 0; j2 < N; j2++){
+                if(d[i][j] != d2[i][j]){
+                    cout << "Something went wrong ";
+                    return 0;
+                }
+            }
+        }
         end -= start;
         all += end;
         nmin = min(end, nmin);
