@@ -150,7 +150,6 @@ int main() {
     int nmax = 0;
     for(int i = 0; i < exp; i++){
         // создаем граф
-        if(i % 10 == 0) cout << i << endl;
         brg a(n, edges_count);
 
         // запускаем
