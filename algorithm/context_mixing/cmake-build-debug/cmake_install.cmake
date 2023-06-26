@@ -1,4 +1,4 @@
-# Install script for directory: D:/algorithm/context_mixing
+# Install script for directory: D:/4-sem-programming/algorithm/context_mixing
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "D:/algorithm/context_mixing/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "D:/4-sem-programming/algorithm/context_mixing/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
