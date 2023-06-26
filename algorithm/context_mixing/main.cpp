@@ -130,24 +130,26 @@ public:
 };
 class models{
 public:
+    int len = 0;
     model1 a1;
     model2 a2;
     model3 a3;
     model4 a4;
     model5 a5;
     model6 a6;
-    void add(int x, int pos){
+    void add(int x){
         a2.add(x);
         a3.add(x);
         a4.add(x);
-        a5.add(x, pos);
-        a6.add(x, pos);
+        a5.add(x, len);
+        a6.add(x, len);
+        len++;
     }
 
 
-    void pop(int x, int pos){
+    void pop(int x){
         a3.pop(x);
-        a6.pop(x, pos);
+        a6.pop(x, len - 49);
     }
 
     void clear(){
@@ -157,7 +159,7 @@ public:
         a5.clear();
         a6.clear();
     }
-    ld get(int pos){
+    ld get(){
     ///              0       1     2    3   4     5
         vector <ld> w = {0.05, 0.25, 0.1, 0.25, 0.25, 0.1};
         ld n0 = 0;
@@ -165,20 +167,18 @@ public:
         n0 += a2.get() * w[1];
         n0 += a3.get() * w[2];
         n0 += a4.get() * w[3];
-        n0 += a5.get(pos) * w[4];
-        n0 += a6.get(pos) * w[5];
+        n0 += a5.get(len) * w[4];
+        n0 += a6.get(len) * w[5];
         return n0;
     }
 };
 
-vector<ld> calc(models p, int pos){
-    ld n0 = p.get(pos);
+vector<ld> calc(models p){
+    ld n0 = p.get();
     return {n0, 1 - n0};
 }
 
 string s2 = "";
-vector <ld> a2[3], b2[3];
-vector <ld> a3, b3;
 
 class code {
 public:
@@ -186,69 +186,73 @@ public:
         ld left = 0;
         ld right = 1;
         for (int i = 0; i < s.size(); i++) {
-            int symb = s[i] - '0';
-            vector<ld> probability = calc(p, i);
-            a3.push_back(probability[0]);
-            ld newLeft = left;
-            ld newRight = right;
-            if (!symb) newRight = left + (right - left) * probability[0];
-            else newLeft = left + (right - left) * probability[0];
-            left = newLeft;
-            right = newRight;
-            s2 += s[i];
-            p.add(symb, i);
-            if (s2.size() >= 48) {
-                p.pop(s2[s2.size() - 48] - '0', s2.size());
+            for(int j = 7; j >= 0; j--) {
+                int symb = ((1 << j) & (s[i])) != 0;
+                vector<ld> probability = calc(p);
+                if (!symb) right = left + (right - left) * probability[0];
+                else left = left + (right - left) * probability[0];
+                s2 += char(symb + '0');
+                p.add(symb);
+                if (s2.size() == 49) {
+                    p.pop(s2[s2.size() - 49] - '0');
+                    s2.erase(s2.begin());
+                }
             }
         }
         return (left + right) / 2;
     }
 };
-
+string ress2 = "";
 class decode{
 public:
     void arithmeticDecoding(models p, ld c, int n) {
         for(int i = 0; i < n; i++) {
-            vector <ld> probability = calc(p, i);
-            b3.push_back(probability[0]);
-            if(c <= probability[0]){
-                ress += '0';
-                c = (c) / (probability[0]);
-            } else {
-                ress += '1';
-                c = (c - probability[0]) / (1. - probability[0]);
+            int res = 0;
+            for(int j = 0; j < 8; j++) {
+                vector<ld> probability = calc(p);
+                res *= 2;
+                if (c <= probability[0]) {
+                    ress += '0';
+                    c = (c) / (probability[0]);
+                } else {
+                    res++;
+                    ress += '1';
+                    c = (c - probability[0]) / (1. - probability[0]);
+                }
+                p.add(ress.back() - '0');
+                if (ress.size() == 49) {
+                    p.pop(ress[ress.size() - 49] - '0');
+                    ress.erase(ress.begin());
+                }
             }
-            p.add(ress.back() - '0', i);
-            if(ress.size() >= 48){
-                p.pop(ress[ress.size() - 48] - '0',ress.size());
-            }
+            ress2 += char(res);
         }
     }
 };
 
 
 int main() {
+    string abc = "qwertyuioplkjhgfdsazxcvbnm1234567890 ";
+    int len = abc.size();
     string s = "";
-    int n = 1010;
+    int n = 13;
     for(int i = 0; i < n; i++){
-        s += char(rand() % 2 + '0');
+        s += char(abc[rand() % len]);
     }
-    //cout << s << endl;
+    cout << s << endl;
     models p;
     code a;
 
-    int g = 48;
+    int g = 6;
     ofstream fout_text("text.txt");
-    fout_text << s << endl;
+    fout_text << s;
     ofstream fout("encode.txt");
     fout << n << endl;
     for(int i = 0; i < n; i += g){
         string cur_s = s.substr(i, min(g, int(s.size()) - i));
         ld cur = a.arithmeticCoding(p, cur_s);
-        fout << fixed << setprecision(17) << cur << endl;
+        fout << fixed << setprecision(20) << cur << endl;
     }
-
-    cout << "\nEncoded\n";
     p.clear();
     ifstream fin("encode.txt");
     fin >> n;
@@ -258,21 +262,6 @@ int main() {
         fin >> c;
         b.arithmeticDecoding(p, c, min((i + 1) * g, int(s.size())) - i * g);
     }
-    for(int i = 0; i < n; i++){
-
-        if(a3[i] != b3[i]){
-            cout << "unequal at " << i << "\n";
-            cout << a3[i] << " " << b3[i] << endl;
-        }
-    }
-    //cout << ress << endl;
-    if(ress != s) {
-        for(int i = 0; i < s.size(); i++){
-            if(ress[i] != s[i]) {
-                cout << "equal at " << i << " symb\n";
-                break;
-            }
-        }
-    } else cout << "equal";
+    if(ress2 == s) cout << "equal";
     return 0;
 }
